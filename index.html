@@ -1,0 +1,342 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Attendance System</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    padding: 30px 15px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+}
+
+h1 {
+    text-align: center;
+    color: #5145a5;
+    margin-bottom: 25px;
+}
+
+.stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    flex: 1;
+    min-width: 120px;
+    padding: 18px;
+    text-align: center;
+    background: #eeeaff;
+    border-radius: 10px;
+}
+
+.stat h2 {
+    color: #5145a5;
+    margin-top: 8px;
+}
+
+form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+}
+
+button {
+    padding: 12px;
+    background: #5145a5;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #352b80;
+}
+
+.submit-btn {
+    grid-column: span 2;
+}
+
+.search {
+    margin: 25px 0 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #5145a5;
+    color: white;
+}
+
+.present {
+    color: green;
+    font-weight: bold;
+}
+
+.absent {
+    color: red;
+    font-weight: bold;
+}
+
+.delete {
+    background: #e53935;
+    padding: 7px 10px;
+}
+
+@media(max-width:600px) {
+    form {
+        grid-template-columns: 1fr;
+    }
+
+    .submit-btn {
+        grid-column: span 1;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 7px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎓 Student Attendance System</h1>
+
+<div class="stats">
+    <div class="stat">
+        Total Students
+        <h2 id="total">0</h2>
+    </div>
+
+    <div class="stat">
+        Present
+        <h2 id="present">0</h2>
+    </div>
+
+    <div class="stat">
+        Absent
+        <h2 id="absent">0</h2>
+    </div>
+</div>
+
+<h3>Mark Student Attendance</h3>
+<br>
+
+<form id="attendanceForm">
+
+<input type="text" id="name"
+placeholder="Student Full Name" required>
+
+<input type="text" id="roll"
+placeholder="Roll Number" required>
+
+<input type="text" id="course"
+placeholder="Course / Class" required>
+
+<input type="date" id="date" required>
+
+<select id="status" required>
+<option value="">Select Attendance</option>
+<option value="Present">Present</option>
+<option value="Absent">Absent</option>
+</select>
+
+<button class="submit-btn" type="submit">
+Submit Attendance
+</button>
+
+</form>
+
+<div class="search">
+<input type="text" id="search"
+placeholder="🔍 Search student by name or roll number">
+</div>
+
+<h3>Attendance Records</h3>
+
+<div style="overflow-x:auto;">
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Roll No.</th>
+<th>Course</th>
+<th>Date</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="records"></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+
+let attendance = JSON.parse(
+    localStorage.getItem("attendance")
+) || [];
+
+document.getElementById("date").value =
+    new Date().toISOString().split("T")[0];
+
+function saveData() {
+    localStorage.setItem(
+        "attendance",
+        JSON.stringify(attendance)
+    );
+}
+
+document.getElementById("attendanceForm")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    let record = {
+        name: document.getElementById("name").value.trim(),
+        roll: document.getElementById("roll").value.trim(),
+        course: document.getElementById("course").value.trim(),
+        date: document.getElementById("date").value,
+        status: document.getElementById("status").value
+    };
+
+    let exists = attendance.some(item =>
+        item.roll === record.roll &&
+        item.date === record.date
+    );
+
+    if (exists) {
+        alert("Attendance already marked for this student today!");
+        return;
+    }
+
+    attendance.push(record);
+
+    saveData();
+    displayRecords();
+
+    this.reset();
+
+    document.getElementById("date").value =
+        new Date().toISOString().split("T")[0];
+
+});
+
+function displayRecords() {
+
+    let records = document.getElementById("records");
+    records.innerHTML = "";
+
+    attendance.forEach((item, index) => {
+
+        let row = document.createElement("tr");
+
+        [item.name, item.roll, item.course, item.date,
+         item.status].forEach(value => {
+
+            let cell = document.createElement("td");
+            cell.textContent = value;
+
+            if (value === "Present") cell.className = "present";
+            if (value === "Absent") cell.className = "absent";
+
+            row.appendChild(cell);
+        });
+
+        let action = document.createElement("td");
+        let btn = document.createElement("button");
+
+        btn.textContent = "Delete";
+        btn.className = "delete";
+
+        btn.onclick = function() {
+            attendance.splice(index, 1);
+            saveData();
+            displayRecords();
+        };
+
+        action.appendChild(btn);
+        row.appendChild(action);
+        records.appendChild(row);
+
+    });
+
+    document.getElementById("total").textContent =
+        attendance.length;
+
+    document.getElementById("present").textContent =
+        attendance.filter(x => x.status === "Present").length;
+
+    document.getElementById("absent").textContent =
+        attendance.filter(x => x.status === "Absent").length;
+}
+
+document.getElementById("search")
+.addEventListener("input", function() {
+
+    let value = this.value.toLowerCase();
+
+    document.querySelectorAll("#records tr").forEach(row => {
+
+        row.style.display =
+            row.textContent.toLowerCase().includes(value)
+            ? "" : "none";
+
+    });
+
+});
+
+displayRecords();
+
+</script>
+
+</body>
+</html>
