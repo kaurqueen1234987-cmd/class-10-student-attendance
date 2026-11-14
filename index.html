@@ -143,6 +143,27 @@ th {
 </head>
 
 <body>
+  <script>
+  function sendDataToSheet() {
+    var url = "https://script.google.com/macros/s/AKfycbyk9JaspommWtSd7Iefp1qBQtkzFZoZ7NH66m4p8d7q0-D41cSbOgHCZE-51-gzimbTw/exec";
+    
+    fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(() => {
+      alert("Attendance Marked succesfully!");
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+  }
+</script>
+
+<button onclick="sendDataToSheet()">Mark Attendance</button>  
 
 <div class="container">
 
