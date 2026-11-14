@@ -222,14 +222,15 @@ placeholder="🔍 Search student by name or roll number">
 <script>
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyC3pQ_S4R6N-NusVu-HHGVDg6r4MZnO8_E",
+  apiKey: "AIzaSyC3pQ_S4R6N-NusVu-HHGVDg6r4MZN08_E",
   authDomain: "class-10-student-attendance.firebaseapp.com",
   projectId: "class-10-student-attendance",
-  storageBucket: "class-10-student-attendance.firebasestorage.app",
+  storageBucket: "class-10-student-attendance.appspot.com",
   messagingSenderId: "125461710756",
   appId: "1:125461710756:web:bd0be2ddb18e2404876331",
   measurementId: "G-64FYCCJ2YP"
 };
+
 let attendance = JSON.parse(
     localStorage.getItem("attendance")
 ) || [];
@@ -245,7 +246,7 @@ function saveData() {
 }
 
 document.getElementById("attendanceForm")
-.addEventListener("submit", function(e) {
+    .addEventListener("submit", function(e) {
 
     e.preventDefault();
 
@@ -257,7 +258,7 @@ document.getElementById("attendanceForm")
         status: document.getElementById("status").value
     };
 
-    let exists = attendance.some(item =>
+    let exists = attendance.some(item => 
         item.roll === record.roll &&
         item.date === record.date
     );
@@ -280,17 +281,14 @@ document.getElementById("attendanceForm")
 });
 
 function displayRecords() {
-
     let records = document.getElementById("records");
     records.innerHTML = "";
 
     attendance.forEach((item, index) => {
-
         let row = document.createElement("tr");
 
         [item.name, item.roll, item.course, item.date,
          item.status].forEach(value => {
-
             let cell = document.createElement("td");
             cell.textContent = value;
 
@@ -315,36 +313,32 @@ function displayRecords() {
         action.appendChild(btn);
         row.appendChild(action);
         records.appendChild(row);
-
     });
 
-    document.getElementById("total").textContent =
+    document.getElementById("total").textContent = 
         attendance.length;
 
-    document.getElementById("present").textContent =
+    document.getElementById("present").textContent = 
         attendance.filter(x => x.status === "Present").length;
 
-    document.getElementById("absent").textContent =
+    document.getElementById("absent").textContent = 
         attendance.filter(x => x.status === "Absent").length;
 }
 
 document.getElementById("search")
-.addEventListener("input", function() {
+    .addEventListener("input", function() {
 
     let value = this.value.toLowerCase();
 
     document.querySelectorAll("#records tr").forEach(row => {
-
         row.style.display =
             row.textContent.toLowerCase().includes(value)
             ? "" : "none";
-
     });
 
 });
 
 displayRecords();
-
 </script>
 
 </body>
